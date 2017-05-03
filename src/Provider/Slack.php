@@ -81,6 +81,9 @@ class Slack extends AbstractProvider
      */
     protected function checkResponse(ResponseInterface $response, $data)
     {
+        if (false === 'ok' && isset($data['error'])) {
+            throw new IdentityProviderException($data['error'], 0, $data);
+        }
     }
 
     /**
@@ -101,7 +104,10 @@ class Slack extends AbstractProvider
      */
     protected function getDefaultScopes()
     {
-        return [];
+        return [
+            'users:read',
+            'users:read.email',
+        ];
     }
 
     /**
@@ -115,7 +121,7 @@ class Slack extends AbstractProvider
 
         $request = $this->getAuthenticatedRequest(self::METHOD_GET, $url, $token);
 
-        return $this->getResponse($request);
+        return $this->getParsedResponse($request);
     }
 
     /**
